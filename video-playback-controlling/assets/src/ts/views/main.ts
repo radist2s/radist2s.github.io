@@ -89,10 +89,7 @@ export default class MainView extends Backbone.View<Backbone.Model> {
 
         durationPerState = durationPerState * 1000
 
-        const currentVideoTime = this.mainVideoNode.currentTime * 1000
-        const currentVideoState = Math.ceil(currentVideoTime / durationPerState)
-
-        const videoStartTime = currentVideoTime
+        const videoStartTime = this.mainVideoNode.currentTime * 1000
 
         const videoEndTime = durationPerState * videoState
 
@@ -100,7 +97,17 @@ export default class MainView extends Backbone.View<Backbone.Model> {
 
         const playbackDuration = Math.min(Math.abs(videoEndTime - videoStartTime), durationPerState)
 
+        let frameStart = Date.now()
+
         const playbackLoop = () => {
+            if (Date.now() - frameStart < 50) {
+                this.playbackFrame = requestAnimationFrame(playbackLoop)
+
+                return
+            }
+
+            frameStart = Date.now()
+
             const timeElapsed = Date.now() - playbackStartTime
 
             const completed = Math.min(timeElapsed / playbackDuration, 1)
@@ -110,7 +117,7 @@ export default class MainView extends Backbone.View<Backbone.Model> {
 
                 const currentVideoTimeEased = (videoEndTime - videoStartTime) * easingFactor + videoStartTime
 
-                this.mainVideoNode.currentTime = currentVideoTimeEased / 1000
+                this.mainVideoNode.currentTime = parseFloat((currentVideoTimeEased / 1000).toFixed(6))
 
                 this.playbackFrame = requestAnimationFrame(playbackLoop)
             }

@@ -134,19 +134,23 @@ System.register(["backbone"], function (exports_1, context_1) {
                         cancelAnimationFrame(this.playbackFrame);
                     }
                     durationPerState = durationPerState * 1000;
-                    var currentVideoTime = this.mainVideoNode.currentTime * 1000;
-                    var currentVideoState = Math.ceil(currentVideoTime / durationPerState);
-                    var videoStartTime = currentVideoTime;
+                    var videoStartTime = this.mainVideoNode.currentTime * 1000;
                     var videoEndTime = durationPerState * videoState;
                     var playbackStartTime = Date.now();
                     var playbackDuration = Math.min(Math.abs(videoEndTime - videoStartTime), durationPerState);
+                    var frameStart = Date.now();
                     var playbackLoop = function () {
+                        if (Date.now() - frameStart < 50) {
+                            _this.playbackFrame = requestAnimationFrame(playbackLoop);
+                            return;
+                        }
+                        frameStart = Date.now();
                         var timeElapsed = Date.now() - playbackStartTime;
                         var completed = Math.min(timeElapsed / playbackDuration, 1);
                         if (completed < 1) {
                             var easingFactor = _this.animationEasing(completed, playbackDuration * completed, 0, 1, playbackDuration);
                             var currentVideoTimeEased = (videoEndTime - videoStartTime) * easingFactor + videoStartTime;
-                            _this.mainVideoNode.currentTime = currentVideoTimeEased / 1000;
+                            _this.mainVideoNode.currentTime = parseFloat((currentVideoTimeEased / 1000).toFixed(6));
                             _this.playbackFrame = requestAnimationFrame(playbackLoop);
                         }
                         else {
