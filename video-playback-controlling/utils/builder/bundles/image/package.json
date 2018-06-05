@@ -1,0 +1,63 @@
+{
+  "name": "boilerplate-gulpfile-image",
+  "config": {
+    "localInstallation": false,
+    "rasterSprites": {
+      "chunksMask": "**/*.png",
+      "chunksMaskRetina": "**/*2x.png",
+      "cssBuildDir": "../../assets/src/less/build/sprites-raster",
+      "imgBuildDir": "../../assets/dist/img/build/sprites-raster",
+      "imgBuildDirCss": "../img/build/sprites-raster",
+      "outFormat": "less",
+      
+      "tasks": [
+        {
+          "sourcePath": "../../assets/src/img/raster/desktop/sprites/main",
+          "png8": false,
+          "jpeg": false,
+          "retina": true,
+          "spriteVarPrefix": "icon-",
+          "buildSubDir": "desktop"
+        }
+      ]
+    },
+    "svgSprites": {
+      "sourceDirSymbols": ["../../assets/src/img/svg/symbols/main"],
+      "sourceDirSprites": ["../../assets/src/img/svg/sprites/main"],
+
+      "outStyleFile": {
+        "sprite": "../../assets/src/less/build/sprites/%subDir/svg-sprite.less",
+        "symbols": "../../assets/src/less/build/symbols/%subDir/svg-symbols.less"
+      },
+
+      "buildDirSprites": "../../assets/dist/img/build/sprites/svg",
+      "buildDirSymbols": "../../assets/dist/img/build/symbols/svg",
+      "styleSvgSpritePath": "../img/build/sprites/svg/%subDir/%f",
+      "symbolsBaseUrl": "assets/dist/img/build/symbols/svg/%f",
+
+      "spriteFileName": "sprite.svg",
+      "symbolFileName": "symbols.svg",
+      "selector": "icon-%f"
+    }
+  },
+  "private": true,
+  "version": "0.0.0",
+  "description": "",
+  "main": "gulptasks-image.js",
+  "dependencies": {
+    "gulp-imagemin": "*",
+    "gulp.spritesmith": ">=6.2",
+    "imagemin-pngquant": ">=4.0.0",
+    "imagemin-webp": ">=4.0.0",
+    "gulp-svg-sprites": ">=3.0",
+    "imagemin-svgo": "*",
+    "svgo-plugin-unify-ids": "*",
+    "gulp-retina-sprites-normalizer": "*"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

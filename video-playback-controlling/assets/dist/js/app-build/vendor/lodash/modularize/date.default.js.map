@@ -1,0 +1,1 @@
+{"version":3,"sources":["vendor/lodash/modularize/date.default.js"],"names":["now"],"mappings":";;;;;;AAAA;;;;;;kBAEe;AACbA;AADa,C","file":"vendor/lodash/modularize/date.default.js","sourcesContent":["import now from './now.js';\n\nexport default {\n  now\n};\n"],"sourceRoot":"../../../../../../src/js"}

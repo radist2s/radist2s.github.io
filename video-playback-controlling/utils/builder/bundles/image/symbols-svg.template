@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="0" height="0" style="position:absolute">
+    <% var defs = _.reduce(svg, function(prev, svgItem) { return prev + (svgItem.defs || '') }, ''); %>
+    <% if (defs) { %>
+    <defs>
+        <%= defs %>
+	</defs>
+	<% } %>
+		
+    <% _.forEach(svg, function(svgItem) { %>
+        <% var preserveAspectRatioAttr = svgItem.preserveAspectRatio ? 'preserveAspectRatio="' + svgItem.preserveAspectRatio + '"' : '' %>
+		<symbol id="<%= svgItem.idPrefix %><%= svgItem.name %>" viewBox="<%= svgItem.viewBox %>" <%= preserveAspectRatioAttr %>>
+			<%= svgItem.data.replace(/<svg.*?>(.*?)<\/svg>/, "$1") %>
+		</symbol>
+	<% }); %>
+</svg>

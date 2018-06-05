@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>Video Playback Controlling</title>
+    <script>
+        !function () {
+            window.appURLs = {
+                appBaseURL: location.href.split('#').shift() + 'assets/dist/js',
+                appBuildDir: 'app-build'
+            }
+        }();
+    </script>
+    <script type='text/javascript' src='assets/dist/js/third-party/es6-promise.auto.js'></script>
+    <script type='text/javascript' src='assets/dist/js/third-party/systemjs/system.src.js'></script>
+
+    <script>
+        !function () {
+            var script = document.createElement('script')
+
+            script.type = 'text/javascript'
+
+            if (location.href.match(/github/)) {
+                script.src = 'assets/dist/js/app-build/index.package.js'
+            }
+            else {
+                script.src = 'assets/dist/js/app-build/systemjs.config.js'
+            }
+
+            document.head.appendChild(script)
+        }();
+    </script>
+
+</head>
+<body id="root">
+<div>
+    <h4 style="color: orange">Controls are for debugging state only</h4>
+    <h4 style="color: orange">Use Radio onlym, not native play/pause</h4>
+    <video id="mainVideo" src="assets/dist/img/video/main.mp4" preload="none" playsinline controls></video>
+</div>
+
+
+<div>
+    <label><input type="radio" name="playback" checked value="0"> 0</label>
+    <label><input type="radio" name="playback" value="1"> 1</label>
+    <label><input type="radio" name="playback" value="2"> 2</label>
+    <label><input type="radio" name="playback" value="3"> 3</label>
+    <label><input type="radio" name="playback" value="4"> 4</label>
+    <label><input type="radio" name="playback" value="5"> 5</label>
+</div>
+
+</body>
+</html>

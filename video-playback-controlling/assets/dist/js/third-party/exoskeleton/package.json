@@ -1,0 +1,11 @@
+{
+  "name": "exoskeleton",
+  "version": "1.0.0",
+  "description": "exoskeleton-module.js - Original Exoskeleton module backbone.nativeajax.js and backbone.nativeview.js - Backbone jQuery bindings for Exoskeleton with no js ========= exoskeleton.js - Overrides for Exoskeleton original module. Final module to use",
+  "main": "exoskeleton.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

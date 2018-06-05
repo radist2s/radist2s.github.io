@@ -1,0 +1,1 @@
+{"version":3,"sources":["vendor/jquery.js"],"names":["module","exports","jquery"],"mappings":";;AAAAA,OAAOC,OAAP,GAAiB,SAASC,MAAT,GAAkB,CAAE,CAArC","file":"vendor/jquery.js","sourcesContent":["module.exports = function jquery() {}"],"sourceRoot":"../../../../src/js"}

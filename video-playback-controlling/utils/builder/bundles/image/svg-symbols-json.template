@@ -1,0 +1,13 @@
+<% var svgSprites = {};
+
+_.forEach(svg, function(svgItem) {
+    svgSprites[svgItem.name] = {
+        height: svgItem.height,
+        width: svgItem.width,
+        viewBox: svgItem.viewBox,
+        idPrefix: svgItem.idPrefix,
+        preserveAspectRatio: svgItem.preserveAspectRatio
+    };
+});
+
+svgSprites = JSON.stringify(svgSprites, null, '\t') %><%= svgSprites %>

@@ -1,0 +1,51 @@
+{
+  "compilerOptions": {
+    "noResolve": true,
+    "baseUrl": ".",
+    "target": "es5",
+    "module": "system",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": false,
+    "isolatedModules": true,
+    "declaration": false,
+    "lib": [
+      "DOM",
+      "DOM.Iterable",
+      "ES5",
+      "ScriptHost",
+      "ES2015.Iterable"
+    ],
+    "paths": {
+      "underscore": "lodash",
+      "common/*": [
+        "common/*"
+      ],
+      "views/*": [
+        "views/*"
+      ],
+      "models/*": [
+        "models/*"
+      ],
+      "modules/*": [
+        "modules/*"
+      ],
+      "page-view-main/*": [
+        "views/pages/page-view-main/*"
+      ],
+      "third-party/*": [
+        "../../dist/js/third-party/*"
+      ]
+    }
+  },
+  "include": [
+    "typings/*.d.ts",
+    "../../node_modules/@types/**/*.d.ts",
+    "**/*.ts",
+    "../../dist/js/third-party/**/*.ts"
+  ],
+  "exclude": [
+    "**/*.spec.ts"
+  ]
+}

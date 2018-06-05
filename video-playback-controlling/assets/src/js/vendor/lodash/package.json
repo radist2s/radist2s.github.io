@@ -1,0 +1,12 @@
+{
+  "name": "lodash",
+  "version": "1.0.0",
+  "main": "lodash.js",
+  "private": true,
+  "scripts": {
+    "install": "lodash category=collection,function,date,lang,object,string include=uniqueId modularize exports=es"
+  },
+  "author": "",
+  "license": "ISC",
+  "description": "Lodash ES modules. Just run `npm i` to update modules."
+}
