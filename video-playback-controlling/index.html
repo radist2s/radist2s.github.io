@@ -31,24 +31,57 @@
         }();
     </script>
 
+    <style>
+        h4 {
+            color: orange;
+        }
+
+        .playback-controls label,
+        .quality-select label {
+            white-space: nowrap;
+            margin-right: 1em;
+            font-family: monospace;
+        }
+
+        .frames-dropped-hud {
+            font-family: monospace;
+        }
+    </style>
 </head>
 <body id="root">
 <div>
-    <h4 style="color: orange">Controls are for debugging state only</h4>
-    <h4 style="color: orange">Use Radio onlym, not native play/pause</h4>
-    <video id="mainVideo" src="assets/dist/img/video/bike.mp4"
+    <h4>Controls are for debugging state only</h4>
+    <h4>Use Radio only, not native play/pause</h4>
+
+    <div class="quality-select">
+        <label><input type="radio" name="source" value="bike-original.mp4" checked></label>
+        <label><input type="radio" name="source" value="bike-1920_30fps_hq.mp4"></label>
+        <label><input type="radio" name="source" value="bike-1920_10fps_hq.mp4"></label>
+        <label><input type="radio" name="source" value="bike-1600_10fps_hq.mp4"></label>
+        <label><input type="radio" name="source" value="bike-960_30fps_hq.mp4"></label>
+        <label><input type="radio" name="source" value="wind-596_60fps_lq.mp4"></label>
+    </div>
+
+    <video id="mainVideo"
+           src-base-path="assets/dist/img/video/"
+           muted
            style="max-width: 100%"
            preload="none" playsinline controls></video>
 </div>
 
 
-<div>
+<div class="playback-controls">
     <label><input type="radio" name="playback" checked value="0"> 0</label>
     <label><input type="radio" name="playback" value="1"> 1</label>
     <label><input type="radio" name="playback" value="2"> 2</label>
     <label><input type="radio" name="playback" value="3"> 3</label>
     <label><input type="radio" name="playback" value="4"> 4</label>
     <label><input type="radio" name="playback" value="5"> 5</label>
+</div>
+
+<div class="frames-dropped-hud">
+    <p>Overtime: <span id="framesDropped">0s</span></p>
+    <p>(less is better)</p>
 </div>
 
 </body>

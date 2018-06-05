@@ -1,0 +1,8 @@
+ffmpeg -i bike-original.mp4 -codec:v libx264 \
+-r 30 \
+-vf "scale=960:-2" \
+-vcodec libx264 \
+-x264opts "keyint=30:min-keyint=30:no-scenecut" \
+-preset slow \
+-an -crf 20 -b:v 0 \
+-y test_keyint_48.mp4

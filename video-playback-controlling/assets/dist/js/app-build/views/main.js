@@ -61,20 +61,29 @@ System.register(["backbone"], function (exports_1, context_1) {
                 }
                 MainView.prototype.events = function () {
                     return {
-                        'change [name=playback]': 'onInputPlaybackChange'
+                        'change [name=playback]': 'onInputPlaybackChange',
+                        'change [name=source]': 'onVideoSourceChange'
                     };
                 };
                 MainView.prototype.initialize = function () {
-                    var _this = this;
                     this.model = new Backbone.Model({
                         videoState: parseInt(this.el.querySelector('[name=playback]:checked').value)
                     });
                     this.mainVideoNode = this.el.querySelector('#mainVideo');
-                    this.videoReadyPromise = new Promise(function (resolve) {
-                        _this.videoReadPromiseAttach().then(resolve);
-                    });
+                    this.framesDroppedCaptionNode = this.el.querySelector('#framesDropped');
                     this.videoStepsTotal = this.el.querySelectorAll('[name=playback]').length;
                     this.listenTo(this.model, 'change:videoState', this.onVideoStateChange);
+                    this.listenTo(this.model, 'change:videoSrc', this.onVideoSrcChange);
+                    Array.prototype.forEach.call(this.el.querySelectorAll('[name=source]'), function (element) {
+                        element.parentElement.insertAdjacentHTML('beforeend', element.value);
+                    });
+                    this.model.set({ videoSrc: this.el.querySelector('[name=source]:checked').value });
+                };
+                MainView.prototype.createVideoReadyPromise = function () {
+                    var _this = this;
+                    return this.videoReadyPromise = new Promise(function (resolve) {
+                        _this.videoReadPromiseAttach().then(resolve);
+                    });
                 };
                 MainView.prototype.videoReadPromiseAttach = function () {
                     return __awaiter(this, void 0, void 0, function () {
@@ -114,6 +123,12 @@ System.register(["backbone"], function (exports_1, context_1) {
                         videoState: parseInt(inputNode.value)
                     });
                 };
+                MainView.prototype.onVideoSourceChange = function (e) {
+                    var inputNode = (e.delegateTarget || e.currentTarget);
+                    this.model.set({
+                        videoSrc: inputNode.value
+                    });
+                };
                 MainView.prototype.onVideoStateChange = function () {
                     return __awaiter(this, void 0, void 0, function () {
                         var videoState;
@@ -136,26 +151,44 @@ System.register(["backbone"], function (exports_1, context_1) {
                     durationPerState = durationPerState * 1000;
                     var videoStartTime = this.mainVideoNode.currentTime * 1000;
                     var videoEndTime = durationPerState * videoState;
-                    var playbackStartTime = Date.now();
                     var playbackDuration = Math.min(Math.abs(videoEndTime - videoStartTime), durationPerState);
-                    var frameStart = Date.now();
+                    var playbackStartTime = undefined, now = undefined;
+                    var skippedRenderTime = 0;
+                    var frameReady = true;
+                    this.framesDroppedCaptionNode.innerHTML = '';
+                    this.mainVideoNode.pause();
+                    this.mainVideoNode.onseeked = function () {
+                        frameReady = true;
+                    };
                     var playbackLoop = function () {
-                        if (Date.now() - frameStart < 50) {
+                        if (!frameReady) {
+                            skippedRenderTime += Date.now() - now;
+                            now = Date.now();
                             _this.playbackFrame = requestAnimationFrame(playbackLoop);
                             return;
                         }
-                        frameStart = Date.now();
-                        var timeElapsed = Date.now() - playbackStartTime;
+                        else {
+                            now = Date.now();
+                            if (playbackStartTime === undefined) {
+                                playbackStartTime = now;
+                            }
+                        }
+                        frameReady = false;
+                        var nowProper = now - skippedRenderTime;
+                        var timeElapsed = nowProper - playbackStartTime;
                         var completed = Math.min(timeElapsed / playbackDuration, 1);
                         if (completed < 1) {
                             var easingFactor = _this.animationEasing(completed, playbackDuration * completed, 0, 1, playbackDuration);
                             var currentVideoTimeEased = (videoEndTime - videoStartTime) * easingFactor + videoStartTime;
-                            _this.mainVideoNode.currentTime = parseFloat((currentVideoTimeEased / 1000).toFixed(6));
+                            var currentTime = parseFloat((currentVideoTimeEased / 1000).toFixed(3));
+                            _this.mainVideoNode.currentTime = currentTime;
                             _this.playbackFrame = requestAnimationFrame(playbackLoop);
                         }
                         else {
                             _this.mainVideoNode.currentTime = videoEndTime / 1000;
+                            _this.mainVideoNode.pause();
                         }
+                        _this.framesDroppedCaptionNode.innerHTML = skippedRenderTime / 1000 + "s";
                     };
                     this.playbackFrame = requestAnimationFrame(playbackLoop);
                 };
@@ -171,6 +204,13 @@ System.register(["backbone"], function (exports_1, context_1) {
                  */
                 MainView.prototype.animationEasing = function (x, t, b, c, d) {
                     return c * Math.sin(t / d * (Math.PI / 2)) + b;
+                };
+                MainView.prototype.onVideoSrcChange = function () {
+                    var _this = this;
+                    this.mainVideoNode.src = this.mainVideoNode.getAttribute('src-base-path') + this.model.get('videoSrc');
+                    this.createVideoReadyPromise().then(function () {
+                        _this.mainVideoNode.currentTime = 0;
+                    });
                 };
                 return MainView;
             }(Backbone.View));

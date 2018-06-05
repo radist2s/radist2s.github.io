@@ -6,10 +6,12 @@ export default class MainView extends Backbone.View<Backbone.Model> {
     private videoReadyPromise: Promise<any>
     private videoStepsTotal: number
     private playbackFrame: number
+    private framesDroppedCaptionNode: HTMLElement
 
     events() {
         return {
-            'change [name=playback]': 'onInputPlaybackChange'
+            'change [name=playback]': 'onInputPlaybackChange',
+            'change [name=source]': 'onVideoSourceChange'
         }
     }
 
@@ -19,14 +21,24 @@ export default class MainView extends Backbone.View<Backbone.Model> {
         })
 
         this.mainVideoNode = this.el.querySelector('#mainVideo') as HTMLVideoElement
-
-        this.videoReadyPromise = new Promise((resolve) => {
-            this.videoReadPromiseAttach().then(resolve)
-        })
+        this.framesDroppedCaptionNode = this.el.querySelector('#framesDropped') as HTMLElement
 
         this.videoStepsTotal = this.el.querySelectorAll('[name=playback]').length
 
         this.listenTo(this.model, 'change:videoState', this.onVideoStateChange)
+        this.listenTo(this.model, 'change:videoSrc', this.onVideoSrcChange)
+
+        Array.prototype.forEach.call(this.el.querySelectorAll('[name=source]'), function (element: HTMLInputElement) {
+            element.parentElement.insertAdjacentHTML('beforeend', element.value)
+        })
+
+        this.model.set({videoSrc: (this.el.querySelector('[name=source]:checked') as HTMLInputElement).value})
+    }
+
+    createVideoReadyPromise() {
+        return this.videoReadyPromise = new Promise((resolve) => {
+            this.videoReadPromiseAttach().then(resolve)
+        })
     }
 
     async videoReadPromiseAttach() {
@@ -70,6 +82,14 @@ export default class MainView extends Backbone.View<Backbone.Model> {
         })
     }
 
+    onVideoSourceChange(e: Event) {
+        const inputNode = (e.delegateTarget || e.currentTarget) as HTMLInputElement
+
+        this.model.set({
+            videoSrc: inputNode.value
+        })
+    }
+
     private async onVideoStateChange() {
         const videoState = this.model.get('videoState')
 
@@ -93,22 +113,46 @@ export default class MainView extends Backbone.View<Backbone.Model> {
 
         const videoEndTime = durationPerState * videoState
 
-        const playbackStartTime = Date.now()
-
         const playbackDuration = Math.min(Math.abs(videoEndTime - videoStartTime), durationPerState)
 
-        let frameStart = Date.now()
+        let playbackStartTime = undefined,
+            now = undefined
+
+        let skippedRenderTime = 0
+
+        let frameReady = true
+
+        this.framesDroppedCaptionNode.innerHTML = ''
+
+        this.mainVideoNode.pause()
+
+        this.mainVideoNode.onseeked = function () {
+            frameReady = true
+        }
 
         const playbackLoop = () => {
-            if (Date.now() - frameStart < 50) {
+            if (!frameReady) {
+                skippedRenderTime += Date.now() - now
+
+                now = Date.now()
+
                 this.playbackFrame = requestAnimationFrame(playbackLoop)
 
                 return
             }
+            else {
+                now = Date.now()
 
-            frameStart = Date.now()
+                if (playbackStartTime === undefined) {
+                    playbackStartTime = now
+                }
+            }
 
-            const timeElapsed = Date.now() - playbackStartTime
+            frameReady = false
+
+            const nowProper = now - skippedRenderTime
+
+            const timeElapsed = nowProper - playbackStartTime
 
             const completed = Math.min(timeElapsed / playbackDuration, 1)
 
@@ -117,13 +161,19 @@ export default class MainView extends Backbone.View<Backbone.Model> {
 
                 const currentVideoTimeEased = (videoEndTime - videoStartTime) * easingFactor + videoStartTime
 
-                this.mainVideoNode.currentTime = parseFloat((currentVideoTimeEased / 1000).toFixed(6))
+                const currentTime = parseFloat((currentVideoTimeEased / 1000).toFixed(3))
+
+                this.mainVideoNode.currentTime = currentTime
 
                 this.playbackFrame = requestAnimationFrame(playbackLoop)
             }
             else {
                 this.mainVideoNode.currentTime = videoEndTime / 1000
+
+                this.mainVideoNode.pause()
             }
+
+            this.framesDroppedCaptionNode.innerHTML = `${skippedRenderTime / 1000}s`
         }
 
         this.playbackFrame = requestAnimationFrame(playbackLoop)
@@ -141,6 +191,14 @@ export default class MainView extends Backbone.View<Backbone.Model> {
      */
     private animationEasing(x, t, b, c, d) {
         return c * Math.sin(t / d * (Math.PI / 2)) + b
+    }
+
+    private onVideoSrcChange() {
+        this.mainVideoNode.src = this.mainVideoNode.getAttribute('src-base-path') + this.model.get('videoSrc')
+
+        this.createVideoReadyPromise().then(() => {
+            this.mainVideoNode.currentTime = 0
+        })
     }
 }
 
